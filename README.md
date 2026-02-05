@@ -42,10 +42,7 @@ python test_physio.py
 
 ### Supported Exercises
 1. **Shoulder Raise** - Arm lateral raise (primary)
-2. **Squat** - Lower body exercise
-3. **Lunge** - Single leg exercise
-4. **Plank** - Core stability hold
-5. **Shoulder Rotation** - Internal/external rotation
+2. **Shoulder Rotation** - Internal/external rotation
 
 ### Form Metrics
 Each exercise includes:

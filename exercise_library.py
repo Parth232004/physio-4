@@ -3,11 +3,8 @@ Physio Intelligence v3 - Exercise Library
 Day 2: Comprehensive exercise metrics and form analysis
 
 Exercise Library:
-- Squats
-- Lunges
-- Planks
+- Shoulder raises
 - Shoulder rotations
-- Shoulder raises (existing)
 """
 
 import json
@@ -15,14 +12,15 @@ from dataclasses import dataclass, field, asdict
 from typing import Dict, List, Optional, Tuple
 from enum import Enum
 from datetime import datetime
+try:
+    from fpdf import FPDF
+except ImportError:
+    FPDF = None
 
 
 class ExerciseType(Enum):
-    """Supported exercise types."""
+    """Supported exercise types - Upper body only."""
     SHOULDER_RAISE = "shoulder_raise"
-    SQUAT = "squat"
-    LUNGE = "lunge"
-    PLANK = "plank"
     SHOULDER_ROTATION = "shoulder_rotation"
 
 
@@ -118,208 +116,6 @@ class ExerciseLibrary:
             recommended_reps=12,
             recommended_sets=3,
             rest_between_sets=45
-        )
-        
-        # Squat
-        self.exercises[ExerciseType.SQUAT] = FormMetrics(
-            exercise_name="Squat",
-            exercise_type=ExerciseType.SQUAT,
-            primary_joints=["left_hip", "left_knee", "left_ankle", "right_hip", "right_knee", "right_ankle"],
-            angle_thresholds={
-                "knee_flexion": AngleRange(0, 160, 90, "degrees"),
-                "hip_flexion": AngleRange(0, 130, 45, "degrees"),
-                "ankle_dorsiflexion": AngleRange(0, 45, 25, "degrees")
-            },
-            joint_thresholds=[
-                JointThreshold(
-                    joint_name="left_knee",
-                    landmark_indices=(23, 25, 27),  # hip, knee, ankle
-                    required_range=AngleRange(70, 160, 90, "degrees"),
-                    warnings=[
-                        "Keep knees tracking over toes",
-                        "Don't let knees cave inward",
-                        "Avoid excessive forward knee movement"
-                    ]
-                ),
-                JointThreshold(
-                    joint_name="right_knee",
-                    landmark_indices=(24, 26, 28),
-                    required_range=AngleRange(70, 160, 90, "degrees"),
-                    warnings=[
-                        "Keep knees tracking over toes",
-                        "Don't let knees cave inward"
-                    ]
-                ),
-                JointThreshold(
-                    joint_name="hip_alignment",
-                    landmark_indices=(11, 23, 25),  # shoulder, hip, knee
-                    required_range=AngleRange(45, 130, 90, "degrees"),
-                    warnings=[
-                        "Keep chest up during descent",
-                        "Avoid rounding the back",
-                        "Maintain neutral spine"
-                    ]
-                )
-            ],
-            phase_definitions={
-                "idle": {"depth_min": 0, "depth_max": 20},
-                "descend": {"depth_min": 20, "depth_max": 80},
-                "hold": {"depth_min": 80, "depth_max": 100},
-                "ascend": {"depth_min": 80, "depth_max": 20},
-                "stand": {"depth_min": 0, "depth_max": 20}
-            },
-            common_mistakes={
-                "descend": [
-                    "Knees caving inward",
-                    "Heels lifting off ground",
-                    "Rounding the lower back",
-                    "Chest falling forward"
-                ],
-                "hold": [
-                    "Losing balance",
-                    "Asymmetrical weight distribution",
-                    "Insufficient depth"
-                ],
-                "ascend": [
-                    "Hyperextending the knees",
-                    "Pushing off with toes only",
-                    "Rushing the movement"
-                ]
-            },
-            recommended_reps=12,
-            recommended_sets=3,
-            rest_between_sets=60
-        )
-        
-        # Lunge
-        self.exercises[ExerciseType.LUNGE] = FormMetrics(
-            exercise_name="Lunge",
-            exercise_type=ExerciseType.LUNGE,
-            primary_joints=["left_hip", "left_knee", "left_ankle", "right_hip", "right_knee", "right_ankle"],
-            angle_thresholds={
-                "front_knee_flexion": AngleRange(0, 110, 90, "degrees"),
-                "back_knee_flexion": AngleRange(70, 110, 90, "degrees"),
-                "hip_extension": AngleRange(0, 45, 20, "degrees")
-            },
-            joint_thresholds=[
-                JointThreshold(
-                    joint_name="front_leg",
-                    landmark_indices=(23, 25, 27),
-                    required_range=AngleRange(70, 110, 90, "degrees"),
-                    warnings=[
-                        "Front knee should be at 90 degrees",
-                        "Don't let front knee pass toes",
-                        "Keep front knee aligned with second toe"
-                    ]
-                ),
-                JointThreshold(
-                    joint_name="back_leg",
-                    landmark_indices=(24, 26, 28),
-                    required_range=AngleRange(70, 110, 90, "degrees"),
-                    warnings=[
-                        "Back knee should be almost vertical",
-                        "Keep back straight"
-                    ]
-                ),
-                JointThreshold(
-                    joint_name="torso",
-                    landmark_indices=(11, 23, 24),
-                    required_range=AngleRange(0, 20, 10, "degrees"),
-                    warnings=[
-                        "Keep torso upright",
-                        "Avoid leaning forward"
-                    ]
-                )
-            ],
-            phase_definitions={
-                "idle": {"depth_min": 0, "depth_max": 10},
-                "step_forward": {"depth_min": 10, "depth_max": 30},
-                "descend": {"depth_min": 30, "depth_max": 80},
-                "hold": {"depth_min": 80, "depth_max": 100},
-                "ascend": {"depth_min": 80, "depth_max": 20},
-                "return": {"depth_min": 20, "depth_max": 0}
-            },
-            common_mistakes={
-                "descend": [
-                    "Front knee passing toes",
-                    "Back heel lifting",
-                    "Torso leaning forward",
-                    "Narrow stance"
-                ],
-                "hold": [
-                    "Loss of balance",
-                    "Asymmetrical weight distribution",
-                    "Insufficient depth"
-                ],
-                "ascend": [
-                    "Pushing off with back leg only",
-                    "Not driving through front heel",
-                    "Losing upright posture"
-                ]
-            },
-            recommended_reps=10,
-            recommended_sets=3,
-            rest_between_sets=60
-        )
-        
-        # Plank
-        self.exercises[ExerciseType.PLANK] = FormMetrics(
-            exercise_name="Plank",
-            exercise_type=ExerciseType.PLANK,
-            primary_joints=["shoulder", "hip", "knee", "ankle"],
-            angle_thresholds={
-                "body_alignment": AngleRange(170, 180, 180, "degrees"),
-                "hip_extension": AngleRange(160, 180, 180, "degrees"),
-                "elbow_extension": AngleRange(160, 180, 180, "degrees")
-            },
-            joint_thresholds=[
-                JointThreshold(
-                    joint_name="body_line",
-                    landmark_indices=(7, 11, 23, 27),  # ear, shoulder, hip, ankle
-                    required_range=AngleRange(170, 180, 180, "degrees"),
-                    warnings=[
-                        "Keep body in straight line",
-                        "Don't let hips sag",
-                        "Don't raise hips too high"
-                    ]
-                ),
-                JointThreshold(
-                    joint_name="shoulder_alignment",
-                    landmark_indices=(11, 13, 23),
-                    required_range=AngleRange(160, 180, 180, "degrees"),
-                    warnings=[
-                        "Keep shoulders over elbows",
-                        "Don't let shoulders creep forward",
-                        "Engage core muscles"
-                    ]
-                ),
-                JointThreshold(
-                    joint_name="head_position",
-                    landmark_indices=(7, 8, 11),
-                    required_range=AngleRange(160, 180, 180, "degrees"),
-                    warnings=[
-                        "Keep head neutral, looking at floor",
-                        "Don't crane neck upward"
-                    ]
-                )
-            ],
-            phase_definitions={
-                "start": {"duration_min": 0, "duration_max": 5},
-                "hold": {"duration_min": 5, "duration_max": 30},
-                "end": {"duration_min": 30, "duration_max": 60}
-            },
-            common_mistakes={
-                "hold": [
-                    "Hips sagging down",
-                    "Hips raised too high",
-                    "Holding breath",
-                    "Looking up instead of down",
-                    "Shoulders behind elbows"
-                ]
-            },
-            recommended_reps=1,  # Time-based
-            recommended_sets=3,
-            rest_between_sets=60
         )
         
         # Shoulder Rotation
@@ -465,13 +261,13 @@ class ExerciseLibrary:
     def get_recommended_exercises(self, difficulty: str = "beginner") -> List[str]:
         """Get recommended exercises based on difficulty level."""
         if difficulty == "beginner":
-            return ["Shoulder Raise", "Plank"]
+            return ["Shoulder Raise"]
         elif difficulty == "intermediate":
-            return ["Shoulder Raise", "Squat", "Plank"]
+            return ["Shoulder Raise", "Shoulder Rotation"]
         elif difficulty == "advanced":
-            return ["Shoulder Raise", "Squat", "Lunge", "Plank", "Shoulder Rotation"]
+            return ["Shoulder Raise", "Shoulder Rotation"]
         else:
-            return ["Shoulder Raise", "Squat"]
+            return ["Shoulder Raise"]
 
 
 # ============== SESSION RECORDER ==============
@@ -898,7 +694,8 @@ class SessionReportExporter:
             },
             "performance_trends": progress_data.get("improvement_trends", {}),
             "recommendations": recommendations,
-            "export_format": "PDF-ready data structure"
+            "export_format": "PDF available",
+            "pdf_available": True
         }
         
         return report
@@ -936,12 +733,8 @@ class SessionReportExporter:
         # Based on exercise type
         if exercise_type == "shoulder_raise":
             recommendations.append("Next exercise: Shoulder Rotation")
-        elif exercise_type == "squat":
-            recommendations.append("Next exercise: Lunge")
-        elif exercise_type == "lunge":
-            recommendations.append("Next exercise: Squat with resistance")
-        elif exercise_type == "plank":
-            recommendations.append("Next exercise: Plank with shoulder taps")
+        elif exercise_type == "shoulder_rotation":
+            recommendations.append("Next exercise: Try Shoulder Raise with increased range of motion")
         
         # General recommendations
         recommendations.append("Always warm up before exercising")
@@ -952,6 +745,70 @@ class SessionReportExporter:
     def export_to_json(self, report: Dict) -> str:
         """Export report to JSON format."""
         return json.dumps(report, indent=2)
+    
+    def export_to_pdf(self, report: Dict, output_path: Optional[str] = None) -> str:
+        """
+        Export report to PDF format.
+        Returns the path to the generated PDF file.
+        """
+        if FPDF is None:
+            raise ImportError("fpdf library is required for PDF export. Install with: pip install fpdf")
+        
+        class PDFReport(FPDF):
+            def header(self):
+                self.set_font('Arial', 'B', 16)
+                self.cell(0, 10, 'Physio Intelligence - Session Report', 0, 1, 'C')
+                self.ln(5)
+            
+            def footer(self):
+                self.set_y(-15)
+                self.set_font('Arial', 'I', 8)
+                self.cell(0, 10, f'Page {self.page_no()}', 0, 0, 'C')
+        
+        pdf = PDFReport()
+        pdf.add_page()
+        
+        # Session Summary
+        pdf.set_font('Arial', 'B', 12)
+        pdf.cell(0, 10, 'Session Summary', 0, 1)
+        pdf.set_font('Arial', '', 10)
+        
+        session_summary = report.get("session_summary", {})
+        pdf.cell(0, 7, f"Session ID: {session_summary.get('session_id', 'N/A')}", 0, 1)
+        pdf.cell(0, 7, f"Exercise Type: {session_summary.get('exercise_type', 'N/A').replace('_', ' ').title()}", 0, 1)
+        pdf.cell(0, 7, f"Duration: {session_summary.get('duration_seconds', 0)} seconds", 0, 1)
+        pdf.cell(0, 7, f"Total Reps: {session_summary.get('total_reps', 0)}", 0, 1)
+        pdf.cell(0, 7, f"Form Score: {session_summary.get('form_score', 0)}%", 0, 1)
+        pdf.ln(5)
+        
+        # Form Quality
+        pdf.set_font('Arial', 'B', 12)
+        pdf.cell(0, 10, 'Form Quality', 0, 1)
+        pdf.set_font('Arial', '', 10)
+        form_quality = report.get("form_quality", {})
+        pdf.cell(0, 7, f"Overall Rating: {form_quality.get('overall_rating', 'N/A')}", 0, 1)
+        pdf.cell(0, 7, f"Issues Count: {form_quality.get('issues_count', 0)}", 0, 1)
+        pdf.ln(5)
+        
+        # Recommendations
+        pdf.set_font('Arial', 'B', 12)
+        pdf.cell(0, 10, 'Recommendations', 0, 1)
+        pdf.set_font('Arial', '', 10)
+        for rec in report.get("recommendations", []):
+            pdf.cell(0, 7, f"- {rec}", 0, 1)
+        pdf.ln(5)
+        
+        # Export info
+        pdf.set_font('Arial', 'I', 8)
+        pdf.cell(0, 7, f"Report generated: {report.get('generated_date', 'N/A')}", 0, 1)
+        pdf.cell(0, 7, f"Report ID: {report.get('report_id', 'N/A')}", 0, 1)
+        
+        # Save to file
+        if output_path is None:
+            output_path = f"session_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
+        pdf.output(output_path)
+        
+        return output_path
 
 
 # ============== MAIN INTEGRATION ==============
@@ -1040,15 +897,12 @@ def test_exercise_library():
     
     # Test getting exercises
     assert ExerciseType.SHOULDER_RAISE in library.exercises
-    assert ExerciseType.SQUAT in library.exercises
-    assert ExerciseType.LUNGE in library.exercises
-    assert ExerciseType.PLANK in library.exercises
     assert ExerciseType.SHOULDER_ROTATION in library.exercises
     
     # Test exercise names
     names = library.get_exercise_names()
     assert "Shoulder Raise" in names
-    assert "Squat" in names
+    assert "Shoulder Rotation" in names
     
     # Test form validation
     validation = library.validate_form(
@@ -1165,6 +1019,14 @@ def test_report_exporter():
     # Generate report
     report = exporter.generate_report(session_data, {}, recommendations)
     assert report["session_summary"]["form_score"] == 85
+    
+    # Test PDF export
+    try:
+        pdf_path = exporter.export_to_pdf(report, "test_report.pdf")
+        assert pdf_path == "test_report.pdf"
+        print("  ✓ PDF export successful")
+    except ImportError:
+        print("  ⚠ fpdf not installed, skipping PDF test")
     
     print("✓ Report Exporter tests passed")
 
