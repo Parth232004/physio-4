@@ -1,0 +1,22 @@
+{
+  "summary": {
+    "session_active": false,
+    "duration_seconds": 70.88,
+    "total_reps": 0,
+    "completed_reps": 0,
+    "consistency_score": 0,
+    "safety_violations": 0,
+    "angle_samples": 1038,
+    "phase_logs_count": 0,
+    "feedback_logs_count": 0,
+    "start_time": "2026-02-05T15:29:49.623655",
+    "end_time": "2026-02-05T15:31:00.505564"
+  },
+  "feedback_summary": {
+    "mild": 16,
+    "warning": 9,
+    "stop": 0
+  },
+  "phase_logs": [],
+  "feedback_logs": []
+}
